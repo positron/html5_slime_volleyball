@@ -28,7 +28,7 @@ function Player(color, side) {
     }
 };
 
-Player.PLAYER_RADIUS = 35;
+Player.PLAYER_RADIUS = 38;
 Player.EYE_RADIUS = 6;
 
 Player.prototype.draw = function(ctx) {
@@ -41,21 +41,22 @@ Player.prototype.draw = function(ctx) {
     // draw the eye
     ctx.beginPath();
     ctx.fillStyle = 'white';
-    ctx.arc(this.x+ this.eyeOffset, 275 - this.y - this.eyeOffset, Player.EYE_RADIUS, 0, 2*Math.PI, true);
+    ctx.arc(this.x + this.eyeOffset, 275 - this.y - this.eyeOffset, Player.EYE_RADIUS, 0, 2*Math.PI, true);
     ctx.fill();
     
     ctx.beginPath();
     ctx.fillStyle = 'black';
-    ctx.arc(this.x+ this.eyeOffset, 275 - this.y - this.eyeOffset, Player.EYE_RADIUS/3, 0, 2*Math.PI, true);
+    ctx.arc(this.x + this.eyeOffset, 275 - this.y - this.eyeOffset, Player.EYE_RADIUS/3, 0, 2*Math.PI, true);
     ctx.fill();
 };
 
 Player.prototype.move = function(keys) {
+    
     if (keys[this.rightKey] === 1)
-        this.x += 2;
+        this.x += 5;
     
     if (keys[this.leftKey] === 1)
-        this.x -= 2;
+        this.x -= 5;
     
     if (keys[this.upKey] === 1 && this.y === 0)
         this.velY = 5;

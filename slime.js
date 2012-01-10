@@ -34,7 +34,6 @@ $(document).ready(function() {
   var KEYS = {};
 
   var mainLoop = function() {
-      //console.log('mainLoop here');
       drawBackground(ctx);
       
       player1.move(KEYS);
@@ -44,7 +43,8 @@ $(document).ready(function() {
       
       drawBall(ctx, 100, 50);
   };
-  timer = window.setInterval(mainLoop, 20);
+  mainLoop();
+  mainLoopTimer = window.setInterval(mainLoop, 20);
 
   $('body').keydown(function(event) {
     KEYS[event.which] = 1;
