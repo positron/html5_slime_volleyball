@@ -4,6 +4,8 @@ function Player(color, side) {
   this.side = side;
   this.y = 0;
   this.velY = 0;
+  this.lastMove = (new Date()).getTime();
+  this.lastJump = 0;
   
   if (this.side === 'left') {
     this.x = 150;
@@ -30,6 +32,10 @@ function Player(color, side) {
 
 Player.PLAYER_RADIUS = 38;
 Player.EYE_RADIUS = 6;
+// All speeds are in px/ms or an accelerations in px/ms/ms
+Player.GRAVITY = -2/1000;
+Player.JUMP_SPEED = 600/1000;
+Player.SPEED = 250/1000;
 
 Player.prototype.draw = function(ctx) {
   // draw the body
@@ -51,23 +57,28 @@ Player.prototype.draw = function(ctx) {
 };
 
 Player.prototype.move = function(keys) {
-  
+  var d = new Date();
+  var delta = d.getTime() - this.lastMove;
+  this.lastMove = d.getTime();
+
   if (keys[this.rightKey] === 1)
-    this.x += 5;
+    this.x += Player.SPEED * delta;
   
   if (keys[this.leftKey] === 1)
-    this.x -= 5;
+    this.x -= Player.SPEED * delta;
   
   if (keys[this.upKey] === 1 && this.y === 0)
-    this.velY = 5;
+    this.lastJump = d.getTime();
 
-  // TODO make a gravity constant
-  this.velY -= 0.2;
-  
-  this.y += this.velY;
+  // give 1 free millisecond to simplify the code. Otherwise I would need a special case
+  // or the above if statement would set lastJump to now as long as the up key is pressed
+  var jumpDelta = d.getTime() - this.lastJump + 1;
+  // physics 101: d = d_0 + vt + (1/2)at^2
+  this.y = Player.JUMP_SPEED * jumpDelta + 0.5 * Player.GRAVITY * jumpDelta * jumpDelta;
+
+  // Stay in the bounds of the game
   if (this.y < 0)
     this.y = 0;
-  
   if (this.x < this.leftBound)
     this.x = this.leftBound;
   if (this.x > this.rightBound)
