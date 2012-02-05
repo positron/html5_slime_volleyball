@@ -30,15 +30,12 @@ $(document).ready(function() {
   var player1 = new Player('red', 'left');
   var player2 = new Player('green', 'right');
 
-  // holds a value of 1 for each key that is currently pressed down
-  var KEYS = {};
-
   var mainLoop = function() {
     drawBackground(ctx);
     
-    player1.move(KEYS);
+    player1.move();
     player1.draw(ctx);
-    player2.move(KEYS);
+    player2.move();
     player2.draw(ctx);
     
     drawBall(ctx, 100, 50);
@@ -47,10 +44,12 @@ $(document).ready(function() {
   mainLoopTimer = window.setInterval(mainLoop, 20);
 
   $('body').keydown(function(event) {
-    KEYS[event.which] = 1;
+    player1.processKey(event.which, 'down');
+    player2.processKey(event.which, 'down');
   });
 
   $('body').keyup(function(event) {
-    KEYS[event.which] = 0;
+    player1.processKey(event.which, 'up');
+    player2.processKey(event.which, 'up');
   });
 }); // document is ready
