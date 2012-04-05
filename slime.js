@@ -29,6 +29,7 @@ $(document).ready(function() {
 
   var player1 = new Player('red', 'left');
   var player2 = new Player('green', 'right');
+  var ball    = new Ball();
 
   var mainLoop = function() {
     drawBackground(ctx);
@@ -38,10 +39,12 @@ $(document).ready(function() {
     player2.move();
     player2.draw(ctx);
     
-    drawBall(ctx, 100, 50);
+    ball.move(player1, player2);
+    ball.draw(ctx);
+    //drawBall(ctx, 100, 50);
   };
   mainLoop();
-  mainLoopTimer = window.setInterval(mainLoop, 20);
+  mainLoopTimer = window.setInterval(mainLoop, 50);
 
   $('body').keydown(function(event) {
     player1.processKey(event.which, 'down');
