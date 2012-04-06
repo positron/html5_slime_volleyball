@@ -22,11 +22,13 @@ function Ball() {
 
    // starting velocity of the ball at the time it changed direction
    this.vx = -0.1;
-   this.vy = 10;
+   this.vy = 0.3;
 };
 
 Ball.SPEED = 900/1000;      // speed of ball after collision with a player.. (keep momentum when colliding with wall?)
 Ball.RADIUS = 10;
+//Ball.GRAVITY = Player.GRAVITY;
+Ball.GRAVITY = 0.26/1000;
 
 // physics psuedo code
 /*
@@ -74,7 +76,7 @@ Ball.prototype.getVertWallCollision = function(x, yTop) {
    if (this.x0 < 22) {
    console.log(time);
    }//*/
-   var y = this.y0 + this.vy * time - Player.GRAVITY * time * time;
+   var y = this.y0 + this.vy * time - 0.5 * Ball.GRAVITY * time * time;
    if (time <= 0 || y > yTop) {
       time = Infinity;
    }
@@ -85,7 +87,7 @@ Ball.prototype.getVertWallCollision = function(x, yTop) {
          x0: x,
          y0: y,
          vx: -this.vx,
-         vy: this.vy
+         vy: this.vy - Ball.GRAVITY * time
       }
    };
 }
@@ -95,20 +97,17 @@ Ball.prototype.move = function(Player1, Player2) {
 
    var update = this.getWallCollision();
    if (this.tb + update.time < now) {
-      // TODO: debug by printing this. I think it is flickering because oscilating between back and forth
-      //console.log(update);
-      //console.log([this.tb, update.time, now]);
       this.tb += update.time;
       this.x0 = update.newVars.x0;
-      //this.y0 = update.newVars.y0;
+      this.y0 = update.newVars.y0;
       this.vx = update.newVars.vx;
       this.vy = update.newVars.vy;
    }
 
-   //this.y = this.y0 + this.vy * t - Player.GRAVITY * t * t;
-   // TODO remove when ground collision written
-   //this.y = this.y < 0 ? 0 : this.y;
    var t = now - this.tb;
+   this.y = this.y0 + this.vy * t - 0.5 * Ball.GRAVITY * t * t;
+   //console.log(this.y);
+
    this.x = this.x0 + this.vx * t;
    //console.log(this.x + '-----------------------');
    //console.log(update);
