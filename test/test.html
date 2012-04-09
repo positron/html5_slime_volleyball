@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<title>QUnit Tests</title>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
 <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
@@ -17,9 +18,14 @@ module('Ball Physics');
 test('Ball test', function() {
    var b = new Ball();
    b.x = 100;
-   b.y = 0;
+   b.y = 100;
+   b.vy = 0;
+   b.vx = -1;
    b.tb = 100;
-   equal(b.x, 100, 'asdf');
+   update = b.getWallCollision();
+   console.log(update.time);
+   equal(update.newVars.x0, Ball.RADIUS, 'X value');
+   equal(update.time, 90, 'Time');
 });
 
 module("Examples");
