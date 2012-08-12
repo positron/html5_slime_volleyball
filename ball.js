@@ -42,10 +42,25 @@ Ball.GRAVITY = 0.26/1000;
    or... maybe a closure that updates itself?
  */
 
+Ball.prototype.getUpdatedVars = function() {
+   var walls = this.getWallCollision();
+   var net   = this.getNetCollision();
+
+   return walls.time < net.time ? walls : net;
+};
+
 Ball.prototype.getGroundCollision = function() {
 };
 
 Ball.prototype.getNetCollision = function() {
+   fenceWidth = 4;
+   var leftSide  = this.getVertWallCollision(750/2 - fenceWidth/2, 40);
+   var rightSide = this.getVertWallCollision(750/2 + fenceWidth/2, 40);
+   var topSide   = this.getHorWallCollision(750/2 - fenceWidth/2, 750/2 + fenceWidth/2, 40);
+
+   var ret = leftSide.time < rightSide.time ? leftSide : rightSide;
+   var ret = ret.time < topSide.time ? ret : topSide;
+   return ret;
 };
 
 // return the update object for 
@@ -92,10 +107,47 @@ Ball.prototype.getVertWallCollision = function(x, yTop) {
    };
 }
 
+// x1 = left coordinate of wall
+// x2 = right coordinate of wall
+// y  = y coordinate of wall
+Ball.prototype.getHorWallCollision = function(x1, x2, y) {
+   // adjust for the radius of the ball
+   y += Ball.RADIUS;
+
+   // get the time the ball will hit the wall
+   var a = 0.5 * -Ball.GRAVITY;
+   var b = this.vy;
+   var c = this.y0 - y;
+   var discriminant = b*b - 4.0 * a * c;
+   var time = (-b + Math.sqrt(discriminant) ) / (2 * a);
+   if (time < 0)
+      time = (-b - Math.sqrt(discriminant) ) / (2 * a);
+
+   // calculate the x coordinate when the ball passes the plane of the wall
+   var x = this.x0 + this.vx * time;
+
+   // if there is no solution or the ball will pass without hitting the wall return an infinite time
+   if (discriminant < 0 || x < x1 || x > x2) {
+      return  { time: Number.MAX_VALUE,
+                 newVars: {}
+      };
+   }
+
+   return {
+      time: time,
+      newVars: {
+         x0: x,
+         y0: y,
+         vx: this.vx,
+         vy: -this.vy
+      }
+   };
+}
+
 Ball.prototype.move = function(Player1, Player2) {
    var now = Date.now();
 
-   var update = this.getWallCollision();
+   var update = this.getUpdatedVars();
    if (this.tb + update.time < now) {
       this.tb += update.time;
       this.x0 = update.newVars.x0;
