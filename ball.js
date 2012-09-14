@@ -1,4 +1,4 @@
-// wolfram alpha: 
+// wolfram alpha:
 //derivative with respect to t of ( d_p + x_p * (t - r_p) - d_b - x_b * (t - r_b)) ^2 + (y_p * (t - r_p) - G * (t - r_p)^2 - (y_0 + y_b * (t - r_p) - G * (t - r_b)^2 ) ) ^ 2
 
 // note that I used r_p instead of t_p becuase it confused wolfram alpha (it means time of last change)
@@ -63,7 +63,7 @@ Ball.prototype.getNetCollision = function() {
    return ret;
 };
 
-// return the update object for 
+// return the update object for
 Ball.prototype.getWallCollision = function() {
    var leftWall  = this.getVertWallCollision(0,   Infinity);
    var rightWall = this.getVertWallCollision(750, Infinity);
@@ -87,10 +87,7 @@ Ball.prototype.getVertWallCollision = function(x, yTop) {
 
    // get the time the ball will hit this wall
    var time = (x - this.x0) / this.vx;
-   /*
-   if (this.x0 < 22) {
-   console.log(time);
-   }//*/
+
    var y = this.y0 + this.vy * time - 0.5 * Ball.GRAVITY * time * time;
    if (time <= 0 || y > yTop) {
       time = Infinity;
@@ -149,6 +146,7 @@ Ball.prototype.move = function(Player1, Player2) {
 
    var update = this.getUpdatedVars();
    if (this.tb + update.time < now) {
+      console.log('Updating!');
       this.tb += update.time;
       this.x0 = update.newVars.x0;
       this.y0 = update.newVars.y0;
@@ -156,15 +154,12 @@ Ball.prototype.move = function(Player1, Player2) {
       this.vy = update.newVars.vy;
    }
 
+   this.printDebug({energy:true});//{vx: true, vy: true, prettyEnergy: true});
+
    var t = now - this.tb;
    this.y = this.y0 + this.vy * t - 0.5 * Ball.GRAVITY * t * t;
-   //console.log(this.y);
 
    this.x = this.x0 + this.vx * t;
-   //console.log(this.x + '-----------------------');
-   //console.log(update);
-
-   //console.log([this.x, this.y]);
 };
 
 Ball.prototype.draw = function(ctx) {
@@ -173,3 +168,43 @@ Ball.prototype.draw = function(ctx) {
    ctx.arc(this.x, 275 - this.y, Ball.RADIUS, 0, 2*Math.PI, true);
    ctx.fill();
 };
+
+/**
+ * I find myself printing these repeatedly for debugging.
+ */
+Ball.prototype.printDebug = function(options) {
+   // this.vy is just the starting vy (vx doesn't change so realvx == this.vx)
+   var time = Date.now() - this.tb;
+   var realvy = this.vy - Ball.GRAVITY * time;
+
+   // velocity = magnitude of x and y vectors
+   var velocity = Math.sqrt(this.vx * this.vx + realvy * realvy);
+
+   // potential energy = m * g * h
+   var penergy = 1 * Ball.GRAVITY * this.y;
+
+   // kinetic energy = 1/2 * m * v^2
+   var kenergy = 0.5 * 1 * velocity * velocity;
+
+   if (options.vx) {
+      console.log('Vx = ' + this.vx);
+   }
+   if (options.vy) {
+      console.log('Vy = ' + this.vy);
+   }
+   if (options.velocity) {
+      console.log('V  = ' + velocity);
+   }
+   if(options.penergy) {
+      console.log('PE = ' + penergy);
+   }
+   if (options.kenergy) {
+      console.log('KE = ' + kenergy);
+   }
+   if (options.energy) {
+      console.log('E  = ' + (kenergy+penergy));
+   }
+   if (options.prettyEnergy) {
+      console.log(kenergy + ' + ' + penergy + ' = ' + (kenergy+penergy));
+   }
+}
